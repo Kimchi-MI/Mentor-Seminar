@@ -1,0 +1,7 @@
+FROM ubuntu:22.04
+
+# ENTRYPOINT — всегда выполняется
+ENTRYPOINT ["echo"]
+
+# CMD — аргументы для ENTRYPOINT
+CMD ["Hello from Docker!"]
