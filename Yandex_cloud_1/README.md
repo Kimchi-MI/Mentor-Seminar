@@ -19,6 +19,8 @@ mart-city-top-products_Ilin_Marat/
 
 │
 
+├── result.png
+
 ├── README.md   
               
 └─── mart_city_top_products.py 
