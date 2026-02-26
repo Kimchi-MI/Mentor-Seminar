@@ -34,5 +34,5 @@ Found 2 items
 
 -rw-r--r--   1 ubuntu hadoop       2052 2026-02-26 05:21 /tmp/sandbox_zeppelin/mart_city_top_products/part-00000-ff26847e-911f-4016-a7d2-bbeb766360bc-c000.snappy.parquet
 
-![alt text](image.png)
+![alt text](result.png)
 
