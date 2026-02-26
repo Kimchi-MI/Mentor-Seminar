@@ -16,8 +16,11 @@
 ## Структура репозитория
 
 mart-city-top-products_Ilin_Marat/
+
 │
-├── README.md                 
+
+├── README.md   
+              
 └─── mart_city_top_products.py 
 
 ## Результат выполнения
