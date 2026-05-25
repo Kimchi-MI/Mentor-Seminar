@@ -1,0 +1,69 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: oil_postgres
+    environment:
+      POSTGRES_USER: oil_user
+      POSTGRES_PASSWORD: oil_pass
+      POSTGRES_DB: oil_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init_db:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - oil_network
+
+  minio:
+    image: minio/minio:latest
+    container_name: oil_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - oil_network
+
+  jupyter:
+    image: jupyter/datascience-notebook:latest
+    container_name: oil_jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    networks:
+      - oil_network
+    depends_on:
+      - postgres
+      - minio
+
+  superset:
+    image: apache/superset:latest
+    container_name: oil_superset
+    environment:
+      SUPERSET_SECRET_KEY: "xK9mP2nQ5rT8vW3yZ7bA1cD4fG6hJ9kL2"
+    ports:
+      - "8088:8088"
+    networks:
+      - oil_network
+    depends_on:
+      - postgres
+    command: >
+      sh -c "
+        superset fab create-admin --username admin --firstname Admin --lastname User --email admin@example.com --password admin &&
+        superset db upgrade &&
+        superset init &&
+        superset run -h 0.0.0.0 -p 8088
+      "
+
+networks:
+  oil_network:
+
+volumes:
+  postgres_data:
+  minio_data:
