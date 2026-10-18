@@ -10,7 +10,7 @@ func main() {
 	var n int
 	fmt.Print("Сколько чисел будете вводить? ")
 	if _, err := fmt.Scan(&n); err != nil || n < 1 {
-		fmt.Println("Ошибка: количество должно быть целым числом >= 1")
+		fmt.Println("Ошибка - количество должно быть целым числом >= 1")
 		return
 	}
 
@@ -20,7 +20,7 @@ func main() {
 		var x float64
 		fmt.Printf("Число %d: ", i)
 		if _, err := fmt.Scan(&x); err != nil {
-			fmt.Println("Ошибка: нужно ввести число")
+			fmt.Println("Ошибка - нужно ввести число")
 			return
 		}
 		nums = append(nums, x)
@@ -58,7 +58,6 @@ func main() {
 	}
 	variance /= float64(n)
 
-	fmt.Println("\n--- Статистика ---")
 	fmt.Printf("Количество: %d\n", n)
 	fmt.Printf("Сумма: %g\n", sum)
 	fmt.Printf("Среднее: %.2f\n", mean)

@@ -6,7 +6,6 @@ func main() {
 	balance := 1000.0
 
 	for {
-		fmt.Println("\n=== Мини-банкомат ===")
 		fmt.Println("1. Проверить баланс")
 		fmt.Println("2. Пополнить счёт")
 		fmt.Println("3. Снять деньги")
@@ -15,7 +14,7 @@ func main() {
 
 		var choice int
 		if _, err := fmt.Scan(&choice); err != nil {
-			fmt.Println("Ошибка: введите номер операции")
+			fmt.Println("Ошибка - введите номер операции")
 			var skip string
 			fmt.Scanln(&skip) 
 			continue

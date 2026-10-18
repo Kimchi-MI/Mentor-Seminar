@@ -18,7 +18,7 @@ func main() {
 	var n int
 	fmt.Print("Введите целое число: ")
 	if _, err := fmt.Scan(&n); err != nil {
-		fmt.Println("Ошибка: нужно ввести целое число")
+		fmt.Println("Ошибка - нужно ввести целое число")
 		return
 	}
 	if isPrime(n) {

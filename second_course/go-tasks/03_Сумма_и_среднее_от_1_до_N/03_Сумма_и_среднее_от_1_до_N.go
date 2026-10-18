@@ -4,9 +4,9 @@ import "fmt"
 
 func main() {
 	var n int
-	fmt.Print("Введите N (натуральное число): ")
+	fmt.Print("Введите натруральное число: ")
 	if _, err := fmt.Scan(&n); err != nil || n < 1 {
-		fmt.Println("Ошибка: N должно быть целым числом >= 1")
+		fmt.Println("Ошибка - N должно быть целым числом >= 1")
 		return
 	}
 

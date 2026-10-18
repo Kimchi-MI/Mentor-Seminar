@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func isSuitable(x int) bool {
+func isS(x int) bool {
 	return x > 0 && x%2 == 0
 }
 
@@ -10,7 +10,7 @@ func main() {
 	var n int
 	fmt.Print("Сколько чисел будете вводить? ")
 	if _, err := fmt.Scan(&n); err != nil || n < 1 {
-		fmt.Println("Ошибка: количество должно быть целым числом >= 1")
+		fmt.Println("Ошибка - количество должно быть целым числом больше 0!")
 		return
 	}
 
@@ -19,10 +19,10 @@ func main() {
 		var x int
 		fmt.Printf("Число %d: ", i)
 		if _, err := fmt.Scan(&x); err != nil {
-			fmt.Println("Ошибка: нужно ввести целое число")
+			fmt.Println("Ошибка - нужно ввести целое число")
 			return
 		}
-		if isSuitable(x) {
+		if isS(x) {
 			sum += x
 		}
 	}
