@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func printMultiplicationTable(n int) {
+func printTable(n int) {
 	for i := 1; i <= 10; i++ {
 		fmt.Printf("%d x %d = %d\n", n, i, n*i)
 	}
@@ -15,5 +15,5 @@ func main() {
 		fmt.Println("Ошибка: нужно ввести целое число")
 		return
 	}
-	printMultiplicationTable(n)
+	printTable(n)
 }
