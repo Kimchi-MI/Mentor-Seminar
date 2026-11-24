@@ -24,16 +24,16 @@ Ready - True
 
 $ kubectl get nodes
 NAME                    STATUS   ROLES           AGE   VERSION
-desktop-control-plane   Ready    control-plane   23m   v1.36.1
-desktop-worker          Ready    <none>          23m   v1.36.1
-desktop-worker2         Ready    <none>          23m   v1.36.1
-desktop-worker3         Ready    <none>          23m   v1.36.1
-desktop-worker4         Ready    <none>          23m   v1.36.1
-desktop-worker5         Ready    <none>          23m   v1.36.1
-desktop-worker6         Ready    <none>          23m   v1.36.1
-desktop-worker7         Ready    <none>          23m   v1.36.1
-desktop-worker8         Ready    <none>          23m   v1.36.1
-desktop-worker9         Ready    <none>          23m   v1.36.1
+  desktop-control-plane   Ready    control-plane   23m   v1.36.1
+  desktop-worker          Ready    <none>          23m   v1.36.1
+  desktop-worker2         Ready    <none>          23m   v1.36.1
+  desktop-worker3         Ready    <none>          23m   v1.36.1
+  desktop-worker4         Ready    <none>          23m   v1.36.1
+  desktop-worker5         Ready    <none>          23m   v1.36.1
+  desktop-worker6         Ready    <none>          23m   v1.36.1
+  desktop-worker7         Ready    <none>          23m   v1.36.1
+  desktop-worker8         Ready    <none>          23m   v1.36.1
+  desktop-worker9         Ready    <none>          23m   v1.36.1
 
 - Сколько нод в кластере и почему?
 Одна control-plane нода, desktop-control-plane — управляет кластером (API-сервер, etcd, scheduler, controller-manager).
@@ -59,13 +59,13 @@ NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/calc-app   3/3     3            3           21m
 
 NAME                                  DESIRED   CURRENT   READY   AGE
-replicaset.apps/calc-app-58964f5766   0         0         0       19m
-replicaset.apps/calc-app-7656884c79   3         3         3       21m
+  replicaset.apps/calc-app-58964f5766   0         0         0       19m
+  replicaset.apps/calc-app-7656884c79   3         3         3       21m
 
 NAME                            READY   STATUS    RESTARTS   AGE
-pod/calc-app-7656884c79-9sqwh   1/1     Running   0          3m33s
-pod/calc-app-7656884c79-hm49g   1/1     Running   0          3m29s
-pod/calc-app-7656884c79-pdq64   1/1     Running   0          3m34s
+  pod/calc-app-7656884c79-9sqwh   1/1     Running   0          3m33s
+  pod/calc-app-7656884c79-hm49g   1/1     Running   0          3m29s
+  pod/calc-app-7656884c79-pdq64   1/1     Running   0          3m34s
 
 - Объясните имена подов: из каких частей они состоят?
 **Имя пода** `calc-app-7656884c79-9sqwh`:
@@ -112,7 +112,7 @@ REVISION  CHANGE-CAUSE
 1. Вывод `kubectl get services -n demo` и строку Endpoints из describe
 $ kubectl get services -n demo
 NAME       TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
-calc-app   NodePort   10.96.106.163   <none>        80:30080/TCP   14m
+  calc-app   NodePort   10.96.106.163   <none>        80:30080/TCP   14m
 ![alt text](image-4.png)
 2. Ответ `curl` по DNS-имени из тестового пода
 Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
@@ -121,7 +121,7 @@ All commands and output from this session will be recorded in container logs, in
 If you don't see a command prompt, try pressing enter.
 ~ $
 ~ $ curl "http://calc-app.demo/calc?op=add&a=2&b=3"
-{"result":5.0}
+  {"result":5.0}
 ![alt text](image-6.png)
 
 3. Ответ: как Service узнаёт, какие поды живы? (подсказка: selector, Endpoints)
@@ -138,9 +138,9 @@ Service сам ничего не менял, selector остался прежн�
 Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
 $ kubectl get pods -n demo
 NAME                        READY   STATUS    RESTARTS   AGE
-calc-app-68fbc75bf9-6qtmr   1/1     Running   0          71s
-calc-app-68fbc75bf9-grqxz   1/1     Running   0          76s
-calc-app-68fbc75bf9-xq6nw   1/1     Running   0          68s
+  calc-app-68fbc75bf9-6qtmr   1/1     Running   0          71s
+  calc-app-68fbc75bf9-grqxz   1/1     Running   0          76s
+  calc-app-68fbc75bf9-xq6nw   1/1     Running   0          68s
 
 Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
 $ kubectl scale deployment calc-app --replicas=5 -n demo
@@ -149,11 +149,11 @@ deployment.apps/calc-app scaled
 Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
 $ kubectl get pods -n demo
 NAME                        READY   STATUS    RESTARTS   AGE
-calc-app-68fbc75bf9-6ptpd   1/1     Running   0          8s
-calc-app-68fbc75bf9-6qtmr   1/1     Running   0          2m11s
-calc-app-68fbc75bf9-grqxz   1/1     Running   0          2m16s
-calc-app-68fbc75bf9-s886w   1/1     Running   0          8s
-calc-app-68fbc75bf9-xq6nw   1/1     Running   0          2m8s
+  calc-app-68fbc75bf9-6ptpd   1/1     Running   0          8s
+  calc-app-68fbc75bf9-6qtmr   1/1     Running   0          2m11s
+  calc-app-68fbc75bf9-grqxz   1/1     Running   0          2m16s
+  calc-app-68fbc75bf9-s886w   1/1     Running   0          8s
+  calc-app-68fbc75bf9-xq6nw   1/1     Running   0          2m8s
 
 Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
 $ kubectl get endpoints calc-app -n demo
@@ -186,11 +186,11 @@ Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointS
 10.244.4.15:5000
 10.244.5.14:5000
 NAME                        READY   STATUS    RESTARTS   AGE    IP            NODE              NOMINATED NODE   READINESS GATES
-calc-app-68fbc75bf9-6ptpd   1/1     Running   0          5m1s   10.244.5.14   desktop-worker5   <none>           <none>
-calc-app-68fbc75bf9-6qtmr   1/1     Running   0          7m4s   10.244.2.13   desktop-worker9   <none>           <none>
-calc-app-68fbc75bf9-grqxz   1/1     Running   0          7m9s   10.244.3.15   desktop-worker8   <none>           <none>
-calc-app-68fbc75bf9-s886w   1/1     Running   0          5m1s   10.244.4.15   desktop-worker    <none>           <none>
-calc-app-68fbc75bf9-xq6nw   1/1     Running   0          7m1s   10.244.1.14   desktop-worker7   <none>           <none>
+  calc-app-68fbc75bf9-6ptpd   1/1     Running   0          5m1s   10.244.5.14   desktop-worker5   <none>           <none>
+  calc-app-68fbc75bf9-6qtmr   1/1     Running   0          7m4s   10.244.2.13   desktop-worker9   <none>           <none>
+  calc-app-68fbc75bf9-grqxz   1/1     Running   0          7m9s   10.244.3.15   desktop-worker8   <none>           <none>
+  calc-app-68fbc75bf9-s886w   1/1     Running   0          5m1s   10.244.4.15   desktop-worker    <none>           <none>
+  calc-app-68fbc75bf9-xq6nw   1/1     Running   0          7m1s   10.244.1.14   desktop-worker7   <none>           <none>
 
 ![alt text](image-7.png)
 
