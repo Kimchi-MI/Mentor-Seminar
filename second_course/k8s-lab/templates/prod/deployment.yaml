@@ -1,0 +1,58 @@
+# ============================================================
+# Шаблон к заданию 3. Deployment — «Управляемое приложение»
+# ------------------------------------------------------------
+# Напоминание из лекции: Deployment -> ReplicaSet -> Pod.
+# Мы описываем ЖЕЛАЕМОЕ состояние, а контроллеры кластера
+# приводят фактическое состояние к нему.
+#
+# Перед началом создайте namespace (один раз):
+#   kubectl create namespace demo
+# ============================================================
+
+apiVersion: apps/v1     # Deployment живёт в API-группе apps
+kind: Deployment
+
+metadata:
+  name: calc-app       # договоримся: calc-app
+  namespace: production        # тот, что создали выше
+
+spec:
+  # Сколько копий приложения должно работать постоянно?
+  # Для лабораторной — 3.
+  replicas: 3
+
+  selector:
+    matchLabels:
+      # По этой бирке ReplicaSet узнает "свои" поды.
+      # ДОЛЖНА совпадать с labels в template ниже — иначе кластер
+      # отклонит манифест при проверке. Вспомните, почему?
+      app: calc-app
+
+  template:               # шаблон, по которому создаются поды
+    metadata:
+      labels:
+        app: calc-app            # тот же label, что выше!
+    spec:
+      containers:
+        - name: calc-app
+          image: localhost:5000/calc-app:v1
+          imagePullPolicy: IfNotPresent   # и политика та же
+          ports:
+            - containerPort: 5000
+          resources:
+            requests: {cpu: 100m, memory: 64Mi}
+            limits:   {cpu: 200m, memory: 128Mi}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+# ------------------------------------------------------------
+# После заполнения:
+#   kubectl apply -f deployment.yaml
+#   kubectl rollout status deployment/calc-app -n demo
+#   kubectl get deployments,replicasets,pods -n demo
+# Ожидается: deployment 3/3, один replicaset, три пода Running.
+# ------------------------------------------------------------
