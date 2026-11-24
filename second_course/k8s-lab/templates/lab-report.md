@@ -22,6 +22,7 @@ Ready - True
 
 ![alt text](image.png)
 
+```bash
 $ kubectl get nodes
 NAME                    STATUS   ROLES           AGE   VERSION
   desktop-control-plane   Ready    control-plane   23m   v1.36.1
@@ -34,6 +35,7 @@ NAME                    STATUS   ROLES           AGE   VERSION
   desktop-worker7         Ready    <none>          23m   v1.36.1
   desktop-worker8         Ready    <none>          23m   v1.36.1
   desktop-worker9         Ready    <none>          23m   v1.36.1
+```
 
 - Сколько нод в кластере и почему?
 Одна control-plane нода, desktop-control-plane — управляет кластером (API-сервер, etcd, scheduler, controller-manager).
@@ -46,26 +48,32 @@ NAME                    STATUS   ROLES           AGE   VERSION
 - Команда, которой вы запустили под: kubectl run calc-pod --image=localhost:5000/calc-app:v1 --port=5000 (дал комментарии в pod.yaml)
 - Ответ приложения на `/calc?op=mul&a=6&b=7`: {"result": 42.0}
 - Что произошло после `kubectl delete pod`? Почему?
+
+```bash
 $ kubectl delete pod calc-pod
 pod "calc-pod" deleted from default namespace
+```
+
 Под был удалён и не восстановился.Это автономный под, который никто не контролирует, т.к. у него нет ни Deployment, ни ReplicaSet, ни StatefulSet, которые могли бы его пересоздать и следить за его состоянием. 
 
 ## Задание 3. Deployment
 
 - Вывод `kubectl get deployments,replicasets,pods -n demo`:
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
+
+```bash
 $ kubectl get deployments,replicasets,pods -n demo
 NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/calc-app   3/3     3            3           21m
 
 NAME                                  DESIRED   CURRENT   READY   AGE
-  replicaset.apps/calc-app-58964f5766   0         0         0       19m
-  replicaset.apps/calc-app-7656884c79   3         3         3       21m
+replicaset.apps/calc-app-58964f5766   0         0         0       19m
+replicaset.apps/calc-app-7656884c79   3         3         3       21m
 
 NAME                            READY   STATUS    RESTARTS   AGE
-  pod/calc-app-7656884c79-9sqwh   1/1     Running   0          3m33s
-  pod/calc-app-7656884c79-hm49g   1/1     Running   0          3m29s
-  pod/calc-app-7656884c79-pdq64   1/1     Running   0          3m34s
+pod/calc-app-7656884c79-9sqwh   1/1     Running   0          3m33s
+pod/calc-app-7656884c79-hm49g   1/1     Running   0          3m29s
+pod/calc-app-7656884c79-pdq64   1/1     Running   0          3m34s
+```
 
 - Объясните имена подов: из каких частей они состоят?
 **Имя пода** `calc-app-7656884c79-9sqwh`:
@@ -82,22 +90,28 @@ NAME                            READY   STATUS    RESTARTS   AGE
 - ревизия 1 — версия v1 (ReplicaSet `7656884c79`);
 - ревизия 2 — версия v2 (ReplicaSet `58964f5766`).
 
+```bash
 $ kubectl rollout history deployment/calc-app -n demo
 deployment.apps/calc-app
 REVISION  CHANGE-CAUSE
 1         <none>
 2         <none>
+```
+
 ![alt text](image-3.png)
 
 После отката (`kubectl rollout undo`) в истории ревизии 2 и 3:
 - ревизия 2 — версия v2 (ReplicaSet `58964f5766`);
 - ревизия 3 — версия v1 (ReplicaSet `7656884c79`).
 
+```bash
 $ kubectl rollout history deployment/calc-app -n demo
 deployment.apps/calc-app
 REVISION  CHANGE-CAUSE
 2         <none>
 3         <none>
+```
+
 ![alt text](image-2.png)
 
 Отвечая на вопрос, Deployment сам поды не создаёт. Он управляет ReplicaSet'ами, а ReplicaSet отвечает за поды: следит, чтобы работало ровно заданное число копий, и пересоздаёт под, если тот упал или был удалён.
@@ -110,18 +124,24 @@ REVISION  CHANGE-CAUSE
 В кластере работает DNS-сервер CoreDNS, и каждый под настроен использовать его. Для каждого Service CoreDNS создаёт запись `<сервис>.<namespace>.svc.cluster.local`, указывающую на ClusterIP сервиса (у меня `10.96.106.163`). Короткое имя `calc-app.demo` работает благодаря search-доменам в `/etc/resolv.conf` пода: к нему автоматически дописывается `svc.cluster.local`. Запрос на ClusterIP kube-proxy перенаправляет на один из подов из Endpoints, поэтому имя остаётся рабочим, даже когда адреса подов меняются.
 
 1. Вывод `kubectl get services -n demo` и строку Endpoints из describe
+```bash
 $ kubectl get services -n demo
 NAME       TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
-  calc-app   NodePort   10.96.106.163   <none>        80:30080/TCP   14m
+calc-app   NodePort   10.96.106.163   <none>        80:30080/TCP   14m
+```
+
 ![alt text](image-4.png)
+
 2. Ответ `curl` по DNS-имени из тестового пода
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
+
+```bash
 $ kubectl run curl-test -n demo --image=curlimages/curl --rm -it --restart=Never -- sh
 All commands and output from this session will be recorded in container logs, including credentials and sensitive information passed through the command prompt.
 If you don't see a command prompt, try pressing enter.
-~ $
 ~ $ curl "http://calc-app.demo/calc?op=add&a=2&b=3"
   {"result":5.0}
+```
+
 ![alt text](image-6.png)
 
 3. Ответ: как Service узнаёт, какие поды живы? (подсказка: selector, Endpoints)
@@ -135,48 +155,40 @@ Service сам за подами не следит. У него есть `select
 В секции Endpoints стало 5 адресов (`10.244.x.x:5000`) вместо трёх: по одному на каждый под.
 Service сам ничего не менял, selector остался прежним. Новые поды получили метку `app=calc-app` и после прохождения проверки готовности автоматически попали в Endpoints.
 
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
+```bash
 $ kubectl get pods -n demo
 NAME                        READY   STATUS    RESTARTS   AGE
-  calc-app-68fbc75bf9-6qtmr   1/1     Running   0          71s
-  calc-app-68fbc75bf9-grqxz   1/1     Running   0          76s
-  calc-app-68fbc75bf9-xq6nw   1/1     Running   0          68s
+calc-app-68fbc75bf9-6qtmr   1/1     Running   0          71s
+calc-app-68fbc75bf9-grqxz   1/1     Running   0          76s
+calc-app-68fbc75bf9-xq6nw   1/1     Running   0          68s
 
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
 $ kubectl scale deployment calc-app --replicas=5 -n demo
 deployment.apps/calc-app scaled
 
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
 $ kubectl get pods -n demo
 NAME                        READY   STATUS    RESTARTS   AGE
-  calc-app-68fbc75bf9-6ptpd   1/1     Running   0          8s
-  calc-app-68fbc75bf9-6qtmr   1/1     Running   0          2m11s
-  calc-app-68fbc75bf9-grqxz   1/1     Running   0          2m16s
-  calc-app-68fbc75bf9-s886w   1/1     Running   0          8s
-  calc-app-68fbc75bf9-xq6nw   1/1     Running   0          2m8s
+calc-app-68fbc75bf9-6ptpd   1/1     Running   0          8s
+calc-app-68fbc75bf9-6qtmr   1/1     Running   0          2m11s
+calc-app-68fbc75bf9-grqxz   1/1     Running   0          2m16s
+calc-app-68fbc75bf9-s886w   1/1     Running   0          8s
+calc-app-68fbc75bf9-xq6nw   1/1     Running   0          2m8s
 
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
 $ kubectl get endpoints calc-app -n demo
 Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
 NAME       ENDPOINTS                                                        AGE
 calc-app   10.244.1.14:5000,10.244.2.13:5000,10.244.3.15:5000 + 2 more...   34m
 
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
 $ kubectl describe service calc-app -n demo | grep -E "Selector|TargetPort|Endpoints"
 Selector:                 app=calc-app
 TargetPort:               5000/TCP
 Endpoints:                10.244.3.15:5000,10.244.2.13:5000,10.244.1.14:5000 + 2 more...
-
-
-- В чём разница между `kubectl scale` и правкой YAML + apply?
-  Какой способ выбрали бы для production?
-
+```
 
 1. Вывод Endpoints при 5 репликах
 
 Необрезанный вывод.
 
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
+```bash
 $ kubectl get endpoints calc-app -n demo -o jsonpath='{range .subsets[0].addresses[*]}{.ip}:5000{"\n"}{end}'
 kubectl get pods -n demo -o wide
 Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
@@ -191,11 +203,12 @@ NAME                        READY   STATUS    RESTARTS   AGE    IP            NO
   calc-app-68fbc75bf9-grqxz   1/1     Running   0          7m9s   10.244.3.15   desktop-worker8   <none>           <none>
   calc-app-68fbc75bf9-s886w   1/1     Running   0          5m1s   10.244.4.15   desktop-worker    <none>           <none>
   calc-app-68fbc75bf9-xq6nw   1/1     Running   0          7m1s   10.244.1.14   desktop-worker7   <none>           <none>
+```
 
 ![alt text](image-7.png)
 
-2. Ответ: чем императивный `kubectl scale` отличается от декларативного `apply`? Какой способ правильный для production и почему?
-`kubectl scale` - императивный способ. Через команду говорим кластеру, что сделать, и меняем только живой объект. В `deployment.yaml` по-прежнему написано старое число реплик (3), поэтому файл и кластер расходятся, а следующий `kubectl apply` вернёт реплики к значению из файла, снова будет 3 как у нас в файле.
+2. В чём разница между `kubectl scale` и правкой YAML + apply? Какой способ выбрали бы для production?
+`kubectl scale` - императивный способ. Через команду говорим кластеру, что сделать, и меняем только живой объект. В `deployment.yaml` по-прежнему написано старое число реплик (3), поэтому файл и кластер расходятся, а следующий `kubectl apply` вернёт реплики к значению из файла, снова будет 3 как у нас в файле. Для production выбрал бы YAML + `apply`, потому что в таком случае изменения юудут прозрачными, повторяемыми и не будут терятся.
 
 3. (по эксперименту) что происходит с подами, которым не хватило ресурсов?
 Планировщик не находит узел с достаточным свободным CPU/памятью (по `requests`), поэтому под остаётся в статусе `Pending`, а в Events появляется `FailedScheduling ... Insufficient cpu`. 
@@ -281,12 +294,12 @@ Allocated resources:
 `restartPolicy` реагирует только на завершение процесса. Если контейнер жив, но завис и не отвечает, kubelet этого не заметит. 
 `livenessProbe` каждые 10 секунд делает HTTP-запрос к `/health`, и после трёх неудач подряд kubelet перезапускает контейнер. Грубо говоря, это проверка на зависание и т.п.
 
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
+```bash
 $ kubectl describe pod -n demo -l app=calc-app | grep -i liveness
     Liveness:     http-get http://:5000/health delay=5s timeout=1s period=10s #success=1 #failure=3
     Liveness:     http-get http://:5000/health delay=5s timeout=1s period=10s #success=1 #failure=3
     Liveness:     http-get http://:5000/health delay=5s timeout=1s period=10s #success=1 #failure=3
-
+```
 
 3. Переведите приложение в namespace `production`. Что придётся поменять в манифестах и командах?
 
@@ -297,9 +310,10 @@ $ kubectl describe pod -n demo -l app=calc-app | grep -i liveness
 - `nodePort` должен быть уникален на весь кластер, поэтому при работе обоих namespace одновременно у сервиса в `production` 30081 вместо 30080.
 - Объекты в разных namespace изолированы: Service выбирает только поды своего namespace.
 
-Admin@XI UCRT64 /d/My/Учеба/ВШЭ/Mentor's Seminar/Seminar/second_course/k8s-lab/templates (main)
+```bash
 $ kubectl get deployments,services -A | grep calc-app
 demo                 deployment.apps/calc-app                 3/3     3            3           5m39s
 production           deployment.apps/calc-app                 3/3     3            3           31s
 demo          service/calc-app     NodePort    10.96.228.21    <none>        80:30080/TCP             5m27s
 production    service/calc-app     NodePort    10.96.178.163   <none>        80:30081/TCP             31s
+```
